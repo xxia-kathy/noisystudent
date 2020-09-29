@@ -35,10 +35,8 @@ python main.py \
     --teacher_model_name=${model_name} \
     --teacher_model_path=${teacher_model_path} \
     --teacher_softmax_temp=1 \
-
-# Additional config for EfficientNet-B0
     --unlabel_ratio=1 \
-    --train_ratio=2
+    --train_ratio=2 \
 
 # Additional config for EfficientNet-B1
 #     --unlabel_ratio=3 \
