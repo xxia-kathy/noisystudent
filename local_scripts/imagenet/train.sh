@@ -33,7 +33,6 @@ python main.py \
     --model_dir=${model_dir} \
     --unlabel_data_dir=${unlabel_data_dir} \
     --teacher_model_name=${model_name} \
-    --teacher_model_path=${teacher_model_path} \
     --teacher_softmax_temp=1 \
     --unlabel_ratio=1 \
     --train_ratio=2 \
