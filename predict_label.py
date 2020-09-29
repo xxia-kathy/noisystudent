@@ -80,6 +80,7 @@ def preprocess(parsed):
   if FLAGS.data_type == 'tfrecord':
     image = tf.image.decode_jpeg(parsed['image/encoded'], channels=3)
 
+  image = tf.reshape(image, [FLAGS.input_image_size, FLAGS.input_image_size, 3])
   features['image'] = preprocessing.preprocess_image(
       image,
       is_training=False,
