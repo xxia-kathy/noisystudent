@@ -30,9 +30,9 @@ python main.py \
     --task_name=svhn \
     --mode=predict \
     --predict_ckpt_path=ckpt/teacher_ckpt/model.ckpt \
-    --file_prefix=extra \
+    --file_prefix=train \
     --label_data_dir=${data_root} \
-    --num_test_images=142 \
+    --num_test_images=100 \
     --data_type=tfrecord \
     --output_dir=${prediction_dir}
 # done
