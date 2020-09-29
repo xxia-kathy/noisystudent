@@ -15,27 +15,24 @@
 #!/bin/bash
 
 
-data_root=./data/svhn/predict/
+data_root=./home/kathy/mnt/data/live_action_vs_animated_tfrecord
 info_dir=${data_root}/info
 data_dir=./data/svhn/proc/unlabeled
 prediction_dir=${data_root}/predict_label
 
 # Prediction jobs for different shards can run in parallel if you have multiple GPUs/TPUs
-for shard_id in {0..127}
-do
-    python main.py \
-        --model_name=efficientnet-b0 \
-        --use_tpu=False \
-        --use_bfloat16=False \
-        --task_name=svhn \
-        --mode=predict \
-        --predict_ckpt_path=ckpt/teacher_ckpt/model.ckpt \
-        --worker_id=0 \
-        --num_shards=128 \
-        --shard_id=${shard_id} \
-        --file_prefix=extra \
-        --label_data_dir=${data_root} \
-        --data_type=tfrecord \
-        --info_dir=${info_dir} \
-        --output_dir=${prediction_dir}
-done
+# for shard_id in {0..127}
+# do
+python main.py \
+    --model_name=efficientnet-b0 \
+    --use_tpu=False \
+    --use_bfloat16=False \
+    --task_name=svhn \
+    --mode=predict \
+    --predict_ckpt_path=ckpt/teacher_ckpt/model.ckpt \
+    --file_prefix=extra \
+    --label_data_dir=${data_root} \
+    --num_test_images=142 \
+    --data_type=tfrecord \
+    --output_dir=${prediction_dir}
+# done
