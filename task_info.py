@@ -27,6 +27,9 @@ def get_mean_std(task_name):
   elif task_name == 'svhn':
     mean = [0.4376821 * 255, 0.4437697 * 255, 0.47280442 * 255]
     stddev = [0.19803012 * 255, 0.20101562 * 255, 0.19703614 * 255]
+  elif task_name == 'yt8m':
+    mean = [0, 0, 0]
+    stddev = [1, 1, 1]
   else:
     assert False
   return mean, stddev
