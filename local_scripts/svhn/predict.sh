@@ -33,6 +33,7 @@ python main.py \
     --file_prefix=train \
     --label_data_dir=${data_root} \
     --num_test_images=100 \
+    --input_image_size=224 \
     --data_type=tfrecord \
     --output_dir=${prediction_dir}
 # done
