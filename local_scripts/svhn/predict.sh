@@ -15,7 +15,7 @@
 #!/bin/bash
 
 
-data_root=./home/kathy/mnt/data/live_action_vs_animated_tfrecord
+data_root=/home/kathy/mnt/data/live_action_vs_animated_tfrecord
 info_dir=${data_root}/info
 data_dir=./data/svhn/proc/unlabeled
 prediction_dir=${data_root}/predict_label
