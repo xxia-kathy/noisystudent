@@ -39,7 +39,7 @@ flags.DEFINE_string('output_dir', '', 'Directory to store prediction results.')
 flags.DEFINE_string('info_dir', '', 'Directory to store information for each shard.')
 
 flags.DEFINE_integer(
-    'num_shards', default=128, help='Total number of shards for the dataset.')
+    'num_shards', default=1, help='Total number of shards for the dataset.')
 
 flags.DEFINE_string(
     'shard_id', default='0', help='Between 0 and num_shards - 1. The shard number to run prediction on.')
