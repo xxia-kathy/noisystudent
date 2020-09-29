@@ -37,6 +37,8 @@ def get_num_train_images(task_name):
     return 1281167
   elif task_name == 'svhn':
     return 73257 - 4000
+  elif task_name = 'yt8m':
+    return 124
   else:
     tf.logging.info(task_name)
     assert False, task_name

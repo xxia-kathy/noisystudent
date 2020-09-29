@@ -14,15 +14,17 @@
 # limitations under the License.
 #!/bin/bash
 
-model_dir=./ckpt/imagenet
-label_data_dir=
-unlabel_data_dir=
-model_name=
-teacher_model_path=
+model_dir=./ckpt/yt8m
+label_data_dir=/home/kathy/mnt/data/live_action_vs_animated_tfrecord
+unlabel_data_dir=/home/kathy/data/yt8m/2/frame/train
+model_name=efficientnet-b0 
+teacher_model_path=./ckpt/teachter_yt8m
 rm -r ${model_dir}
 
 # Training command base:
 python main.py \
+    --task_name=yt8m
+    --input_image_size=128
     --use_tpu=False \
     --use_bfloat16=False \
     --mode=train \
@@ -35,8 +37,8 @@ python main.py \
     --teacher_softmax_temp=1 \
 
 # Additional config for EfficientNet-B0
-#     --unlabel_ratio=1 \
-#     --train_ratio=2
+    --unlabel_ratio=1 \
+    --train_ratio=2
 
 # Additional config for EfficientNet-B1
 #     --unlabel_ratio=3 \
