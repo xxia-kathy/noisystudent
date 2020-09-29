@@ -23,8 +23,8 @@ rm -r ${model_dir}
 
 # Training command base:
 python main.py \
-    --task_name=yt8m
-    --input_image_size=128
+    --task_name=yt8m \
+    --input_image_size=128 \
     --use_tpu=False \
     --use_bfloat16=False \
     --mode=train \
