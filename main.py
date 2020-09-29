@@ -678,7 +678,7 @@ def get_ent(logits):
 
 def main(unused_argv):
   if FLAGS.task_name == 'svhn':
-    FLAGS.input_image_size = 32
+    FLAGS.input_image_size = 224
     FLAGS.small_image_model = True
     FLAGS.num_label_classes = 10
   if FLAGS.num_train_images is None:
