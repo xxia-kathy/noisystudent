@@ -120,6 +120,8 @@ def get_input_fn(params, raw_data=False):
           num_parallel_batches=16, drop_remainder=False))
   dst = dst.map(functools.partial(set_shapes, batch_size))
   dst = dst.prefetch(tf.data.experimental.AUTOTUNE)
+
+  print("ENDOFINPUTFN")
   return dst
 
 
