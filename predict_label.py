@@ -92,6 +92,7 @@ def preprocess(parsed):
 
 
 def get_input_fn(params, raw_data=False):
+  print("TESTTESTTEST")
   batch_size = params['batch_size']
   global shard_id
   if FLAGS.reassign_label:
