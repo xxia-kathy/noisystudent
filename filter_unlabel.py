@@ -127,14 +127,14 @@ def get_worker_id_list():
       worker_id_list = list(range(
           FLAGS.task * num_label_replica_per_worker,
           (FLAGS.task + 1) * num_label_replica_per_worker))
-      tf.logging.info('worker_id_list {:s}'.format(str(worker_id_list)))
+      tf.compat.v1.logging.info('worker_id_list {:s}'.format(str(worker_id_list)))
     else:
       worker_id_list = list(range(FLAGS.total_label_replicas))
   return worker_id_list
 
 
 def get_label_to_image_idx():
-  tf.logging.info('\n\ngetting label to image idx')
+  tf.compat.v1.logging.info('\n\ngetting label to image idx')
   label_to_image_idx = {}
   num_image_for_worker = {}
   for worker_id in get_worker_id_list():
@@ -179,7 +179,7 @@ def get_label_to_image_idx():
 
 
 def get_keep_image_idx(label_to_image_idx, selected_threshold, uid_list):
-  tf.logging.info('\n\ngetting keep image idx')
+  tf.compat.v1.logging.info('\n\ngetting keep image idx')
   stats_dir = os.path.join(
       FLAGS.output_dir,
       'stats')
@@ -217,7 +217,7 @@ def get_keep_image_idx(label_to_image_idx, selected_threshold, uid_list):
       counts[uid_list[label]] += include_copy
       total_keep_example += 1
 
-  tf.logging.info('counts: {:s}'.format(json.dumps(counts, indent=4)))
+  tf.compat.v1.logging.info('counts: {:s}'.format(json.dumps(counts, indent=4)))
   return keep_idx, total_keep_example, counts
 
 
@@ -254,7 +254,7 @@ def filter_image_by_idx(
     return cur_image_list
 
   def flush(sess):
-    tf.logging.info('saving images')
+    tf.compat.v1.logging.info('saving images')
     np.random.shuffle(image_list)
     for image_info in image_list:
       image_bytes = image_info['image_bytes']
@@ -268,18 +268,18 @@ def filter_image_by_idx(
         filename = os.path.join(
             sample_dir, uid, 'image_{:d}_{:d}_{:d}_{:.2f}.jpeg'.format(
                 FLAGS.shard_id, FLAGS.task, cnt, prob))
-        tf.logging.info('saving {:s}'.format(filename))
+        tf.compat.v1.logging.info('saving {:s}'.format(filename))
         image = sess.run(decoded_image,
                         feed_dict={image_bytes_placeholder: image_bytes}
                         )
         utils.save_pic(image, filename)
 
-        tf.logging.info(
+        tf.compat.v1.logging.info(
             '{:d}/{:d} images saved, elapsed time: {:.2f} h'.format(
                 num_picked_images, total_keep_example,
                 (time.time() - start_time) / 3600))
 
-  tf.logging.info('\n\nfilter image by index')
+  tf.compat.v1.logging.info('\n\nfilter image by index')
   num_picked_images = 0
   sample_dir = os.path.join(FLAGS.output_dir, 'samples')
   data_dir = os.path.join(FLAGS.output_dir, 'data')
@@ -299,7 +299,7 @@ def filter_image_by_idx(
       os.path.join(data_dir, 'train-%d-%.5d-of-%.5d' % (
           FLAGS.task, FLAGS.shard_id, FLAGS.num_shards)))
   for worker_id in get_worker_id_list():
-    tf.logging.info('worker_id: {:d}, elapsed time: {:.2f} h'.format(
+    tf.compat.v1.logging.info('worker_id: {:d}, elapsed time: {:.2f} h'.format(
         worker_id, (time.time() - start_time) / 3600.))
     dst = input_dataset(worker_id)
     iter = dst.make_initializable_iterator()
@@ -323,7 +323,7 @@ def filter_image_by_idx(
           if total_cnt % 1000 == 0:
             elapsed_time = (time.time() - start_time) / 3600
             total_image = num_image_for_worker[worker_id]
-            tf.logging.info(
+            tf.compat.v1.logging.info(
                 'scanning idx {:d} of {:d} images, {:d}/{:d} images saved, elapsed time: {:.2f} h, remaining time {:.2f} h'.format(
                     total_cnt, total_image,
                     num_picked_images, total_keep_example,
@@ -340,11 +340,11 @@ def filter_image_by_idx(
         sess.run(elem)
         assert False, "count isn't right"
       except tf.errors.OutOfRangeError:
-        tf.logging.info('count is right')
+        tf.compat.v1.logging.info('count is right')
     assert cnt == num_image_for_worker[worker_id], (cnt, num_image_for_worker[worker_id])
     for idx in keep_idx[worker_id]:
       if idx not in hit_samples:
-        tf.logging.info('\n\nnot hit, %d %d', worker_id, idx)
+        tf.compat.v1.logging.info('\n\nnot hit, %d %d', worker_id, idx)
 
   assert num_picked_images == total_keep_example
   if len(image_list):
@@ -380,7 +380,7 @@ def get_total_counts(uid_list, prelim_stats_dir, prob_threshold):
     for threshold in prob_threshold:
       total_counts[uid] += [[threshold, 0]]
       total_counts_sum[uid] += [[threshold, 0]]
-  tf.logging.info('reading prelim stats')
+  tf.compat.v1.logging.info('reading prelim stats')
 
   while len(to_read_filenames):
     new_to_read_filenames = []
@@ -390,16 +390,16 @@ def get_total_counts(uid_list, prelim_stats_dir, prob_threshold):
         for uid in counts:
           for k in range(len(prob_threshold)):
             total_counts[uid][k][1] += counts[uid][k][1]
-        tf.logging.info('finished reading prelim stats for {:s}'.format(filename))
+        tf.compat.v1.logging.info('finished reading prelim stats for {:s}'.format(filename))
       else:
         new_to_read_filenames += [filename]
-        tf.logging.info('not ready: {:s}'.format(filename))
+        tf.compat.v1.logging.info('not ready: {:s}'.format(filename))
     to_read_filenames = new_to_read_filenames
   return total_counts, total_counts_sum
 
 
 def get_threshold(label_to_image_idx, uid_list, prob_threshold):
-  tf.logging.info('\n\ngetting threshold')
+  tf.compat.v1.logging.info('\n\ngetting threshold')
   threshold_stats = {}
   prelim_stats_dir = FLAGS.prelim_stats_dir
   prelim_stats_filename = os.path.join(prelim_stats_dir, 'prelim_stats_%.5d_%d.json' % (FLAGS.shard_id, FLAGS.task))
@@ -422,7 +422,7 @@ def get_threshold(label_to_image_idx, uid_list, prob_threshold):
     with tf.gfile.Open(
         prelim_stats_filename, 'w') as ouf:
       json.dump(threshold_stats, ouf)
-      tf.logging.info('threshold_stats: {:s}'.format(json.dumps(threshold_stats, indent=4)))
+      tf.compat.v1.logging.info('threshold_stats: {:s}'.format(json.dumps(threshold_stats, indent=4)))
   if is_master_job():
     total_counts_file = os.path.join(prelim_stats_dir, 'total_counts.json')
     if not tf.gfile.Exists(total_counts_file):
@@ -466,11 +466,11 @@ def get_threshold(label_to_image_idx, uid_list, prob_threshold):
         if not FLAGS.use_all:
           if total_image < FLAGS.num_image:
             assert prob_threshold[threshold_idx] == FLAGS.min_threshold
-            tf.logging.info(
+            tf.compat.v1.logging.info(
                 'warning: too few images, {:s} only has {:d} images while we expect {:d} images, upsampling, threshold {:.3f}'.format(
                     uid, total_image, FLAGS.num_image, prob_threshold[threshold_idx]))
           else:
-            tf.logging.info('warning: too many images, {:s} has {:d} images while we expect {:d} images, down sampling, threshold {:.3f}'.format(
+            tf.compat.v1.logging.info('warning: too many images, {:s} has {:d} images while we expect {:d} images, down sampling, threshold {:.3f}'.format(
                 uid, total_image, FLAGS.num_image, prob_threshold[threshold_idx]))
         selected_threshold[uid] = (
             prob_threshold[threshold_idx],
@@ -490,7 +490,7 @@ def get_threshold(label_to_image_idx, uid_list, prob_threshold):
       return None
     threshold_file = os.path.join(FLAGS.output_dir, 'threshold.json')
     while not tf.gfile.Exists(threshold_file):
-      tf.logging.info('waiting for the threshold file')
+      tf.compat.v1.logging.info('waiting for the threshold file')
       time.sleep(300) # sleep 5 min
     selected_threshold = None
     while True:
@@ -511,7 +511,7 @@ def load_json(filename):
         counts = json.load(inf)
       return (True, counts)
     except:
-      tf.logging.info('having error loading {:s}, not exist'.format(
+      tf.compat.v1.logging.info('having error loading {:s}, not exist'.format(
           filename))
   return (False, None)
 
@@ -543,7 +543,7 @@ def read_stats():
               counts = json.load(inf)
             break
           except:
-            tf.logging.info('having error loading {:s}, retrying'.format(
+            tf.compat.v1.logging.info('having error loading {:s}, retrying'.format(
                 filename))
             pass
         for uid in counts:
@@ -551,7 +551,7 @@ def read_stats():
       else:
         new_filename_list += [filename]
     filename_list = new_filename_list
-    tf.logging.info('waiting for: {:s}'.format(' '.join(filename_list)))
+    tf.compat.v1.logging.info('waiting for: {:s}'.format(' '.join(filename_list)))
   count_pairs = total_counts.items()
   count_pairs = sorted(count_pairs, key=lambda x: -x[1])
   num_images_all_label = 0
@@ -565,7 +565,7 @@ def read_stats():
   with tf.gfile.Open(
       os.path.join(FLAGS.output_dir, 'stats', 'final_stats.json'), 'w') as ouf:
     json.dump(final_stats, ouf)
-  tf.logging.info(json.dumps(final_stats, indent=4))
+  tf.compat.v1.logging.info(json.dumps(final_stats, indent=4))
 
 
 def get_label_replicas():
@@ -581,7 +581,7 @@ def get_label_replicas():
     else:
       break
   FLAGS.total_label_replicas = FLAGS.total_label_replicas // 2
-  tf.logging.info('total_label_replicas {:d}'.format(FLAGS.total_label_replicas))
+  tf.compat.v1.logging.info('total_label_replicas {:d}'.format(FLAGS.total_label_replicas))
   assert FLAGS.total_label_replicas > 0
 
 
@@ -591,7 +591,7 @@ def main(argv):
   if load_json(stats_filename)[0]:
     if is_master_job():
       read_stats()
-    tf.logging.info('stats already finished, returning')
+    tf.compat.v1.logging.info('stats already finished, returning')
     return
   prelim_stats_filename = os.path.join(
       FLAGS.prelim_stats_dir,

@@ -64,7 +64,7 @@ def build_learning_rate(
     assert False, 'Unknown lr_decay_type : %s' % lr_decay_type
 
   if warmup_epochs:
-    tf.logging.info('Learning rate warmup_epochs: %d' % warmup_epochs)
+    tf.compat.v1.logging.info('Learning rate warmup_epochs: %d' % warmup_epochs)
     warmup_steps = int(warmup_epochs * steps_per_epoch)
     warmup_lr = (
         initial_lr * tf.cast(lr_step, tf.float32) / tf.cast(
@@ -81,14 +81,14 @@ def build_optimizer(learning_rate,
                     momentum=0.9):
   '''Build optimizer.'''
   if optimizer_name == 'sgd':
-    tf.logging.info('Using SGD optimizer')
+    tf.compat.v1.logging.info('Using SGD optimizer')
     optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
   elif optimizer_name == 'momentum':
-    tf.logging.info('Using Momentum optimizer')
+    tf.compat.v1.logging.info('Using Momentum optimizer')
     optimizer = tf.train.MomentumOptimizer(
         learning_rate=learning_rate, momentum=momentum)
   elif optimizer_name == 'rmsprop':
-    tf.logging.info('Using RMSProp optimizer')
+    tf.compat.v1.logging.info('Using RMSProp optimizer')
     optimizer = tf.train.RMSPropOptimizer(learning_rate, decay, momentum,
                                           epsilon)
   else:
@@ -121,7 +121,7 @@ class TpuBatchNormalization(tf.layers.BatchNormalization):
       return tf.tpu.cross_replica_sum(t, group_assignment) / tf.cast(
           num_shards_per_group, t.dtype)
     else:
-      tf.logging.info('TpuBatchNormalization None')
+      tf.compat.v1.logging.info('TpuBatchNormalization None')
       return tf.tpu.cross_replica_sum(t, group_assignment) / tf.cast(
           num_shards, t.dtype)
 
@@ -138,7 +138,7 @@ class TpuBatchNormalization(tf.layers.BatchNormalization):
         num_shards_per_group = 1
       else:
         num_shards_per_group = max(8, num_shards // 8)
-    tf.logging.info('TpuBatchNormalization with num_shards_per_group %s',
+    tf.compat.v1.logging.info('TpuBatchNormalization with num_shards_per_group %s',
                     num_shards_per_group)
     if num_shards_per_group > 1 or num_shards_per_group == -2:
       # Compute variance using: Var[X]= E[X^2] - E[X]^2.
@@ -182,12 +182,12 @@ def archive_ckpt(ckpt_eval, ckpt_objective, ckpt_path):
     with tf.gfile.GFile(saved_objective_path, 'r') as f:
       saved_objective = float(f.read())
   if saved_objective > ckpt_objective:
-    tf.logging.info('Ckpt %s is worse than %s', ckpt_objective, saved_objective)
+    tf.compat.v1.logging.info('Ckpt %s is worse than %s', ckpt_objective, saved_objective)
     return False
 
   filenames = tf.gfile.Glob(ckpt_path + '.*')
   if filenames is None:
-    tf.logging.info('No files to copy for checkpoint %s', ckpt_path)
+    tf.compat.v1.logging.info('No files to copy for checkpoint %s', ckpt_path)
     return False
 
   # Clear the old folder.
@@ -213,7 +213,7 @@ def archive_ckpt(ckpt_eval, ckpt_objective, ckpt_path):
   with tf.gfile.GFile(saved_objective_path, 'w') as f:
     f.write('%f' % ckpt_objective)
 
-  tf.logging.info('Copying checkpoint %s to %s', ckpt_path, dst_dir)
+  tf.compat.v1.logging.info('Copying checkpoint %s to %s', ckpt_path, dst_dir)
   return True
 
 
@@ -226,7 +226,7 @@ class DepthwiseConv2D(tf.keras.layers.DepthwiseConv2D, tf.layers.Layer):
 
 def save_pic(uint8_arr, filename, log=True):
   if log:
-    tf.logging.info('saving {}'.format(filename))
+    tf.compat.v1.logging.info('saving {}'.format(filename))
   img = Image.fromarray(uint8_arr)
   with tf.gfile.Open(filename, 'wb') as ouf:
     img.save(ouf, subsampling=0, quality=100)
@@ -372,19 +372,19 @@ def init_from_ckpt(scaffold_fn):
       all_var_list, init_ckpt, FLAGS.teacher_model_name is not None)
   if FLAGS.use_tpu:
     def tpu_scaffold():
-      tf.logging.info('initializing from {}'.format(init_ckpt))
+      tf.compat.v1.logging.info('initializing from {}'.format(init_ckpt))
       tf.train.init_from_checkpoint(init_ckpt, assignment_map)
       return tf.train.Scaffold()
     scaffold_fn = tpu_scaffold
   else:
     tf.train.init_from_checkpoint(init_ckpt, assignment_map)
-  tf.logging.info('**** Variables ****')
+  tf.compat.v1.logging.info('**** Variables ****')
   for var in all_var_list:
     init_string = ''
     if var.name in graph_to_ckpt_map:
       init_string = ', *INIT_FROM_CKPT* <== {}'.format(
           graph_to_ckpt_map[var.name])
-    tf.logging.info('  name = %s, shape = %s%s', var.name, var.shape,
+    tf.compat.v1.logging.info('  name = %s, shape = %s%s', var.name, var.shape,
                     init_string)
   return scaffold_fn
 
@@ -393,7 +393,7 @@ def get_filename(data_dir, file_prefix, shard_id, num_shards):
   filename = os.path.join(
       data_dir,
       '%s-%05d-of-%05d' % (file_prefix, shard_id, num_shards))
-  tf.logging.info('processing %s', filename)
+  tf.compat.v1.logging.info('processing %s', filename)
   return filename
 
 
@@ -440,7 +440,7 @@ def get_reassign_filename(data_dir, file_prefix, shard_id, num_shards, worker_id
   filename = os.path.join(
       data_dir,
       '%s-%d-%05d-of-%05d' % (file_prefix, worker_id, shard_id, num_shards))
-  tf.logging.info('writing to %s', filename)
+  tf.compat.v1.logging.info('writing to %s', filename)
   return filename
 
 def get_uid_list():

@@ -375,7 +375,7 @@ class DataInput(TFExampleInput):
                           num_train_shards=None):
     '''see base class.'''
     if not self.data_dir:
-      tf.logging.info('undefined data_dir implies null input')
+      tf.compat.v1.logging.info('undefined data_dir implies null input')
       return tf.data.Dataset.range(1).repeat().map(self._get_null_input)
     if cache is None:
       cache = self.cache
@@ -397,7 +397,7 @@ class DataInput(TFExampleInput):
       if subset == 'train' and unl:
         file_pattern = os.path.join(data_dir, 'extra*')
         new_files += tf.gfile.Glob(file_pattern)
-      tf.logging.info('# files={} for file_pattern: {}'.format(
+      tf.compat.v1.logging.info('# files={} for file_pattern: {}'.format(
           len(new_files), file_pattern))
       file_list += new_files
 
@@ -405,14 +405,14 @@ class DataInput(TFExampleInput):
 
     # Thang: limit num_train_shards
     if self.is_training and num_train_shards:
-      tf.logging.info('Thang: use %d out of %d shards' % (
+      tf.compat.v1.logging.info('Thang: use %d out of %d shards' % (
           num_train_shards, len(file_list)))
       file_list = file_list[:num_train_shards]
 
     dataset = tf.data.Dataset.from_tensor_slices(
         tf.constant(file_list, dtype=tf.string))
 
-    tf.logging.info('file stats for {}, num: {}, all: {}'.format(
+    tf.compat.v1.logging.info('file stats for {}, num: {}, all: {}'.format(
         'unl' if unl else 'in', len(file_list), str(file_list[:10])))
     assert len(file_list) >= num_hosts, 'File list len %d vs num_hosts %d' % (
         len(file_list), num_hosts)

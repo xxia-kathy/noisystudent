@@ -346,7 +346,7 @@ def model_fn(features, mode, params):
   image = preprocess_image(image)
 
   image_shape = image.get_shape().as_list()
-  tf.logging.info('image shape: {}'.format(image_shape))
+  tf.compat.v1.logging.info('image shape: {}'.format(image_shape))
   is_training = (mode == tf.estimator.ModeKeys.TRAIN)
 
   if mode != tf.estimator.ModeKeys.PREDICT:
@@ -372,7 +372,7 @@ def model_fn(features, mode, params):
   has_moving_average_decay = (FLAGS.moving_average_decay > 0)
   # This is essential, if using a keras-derived model.
   tf.keras.backend.set_learning_phase(is_training)
-  tf.logging.info('Using open-source implementation.')
+  tf.compat.v1.logging.info('Using open-source implementation.')
   override_params = {}
   if FLAGS.dropout_rate is not None:
     override_params['dropout_rate'] = FLAGS.dropout_rate
@@ -454,7 +454,7 @@ def model_fn(features, mode, params):
           decay=FLAGS.moving_average_decay)
       ema_vars = utils.get_all_variable()
       restore_vars_dict = ema.variables_to_restore(ema_vars)
-      tf.logging.info('restored variables:\n%s',
+      tf.compat.v1.logging.info('restored variables:\n%s',
                       json.dumps(sorted(restore_vars_dict.keys()), indent=4))
 
     predictions = {
@@ -571,7 +571,7 @@ def model_fn(features, mode, params):
       total_epochs = FLAGS.train_steps * FLAGS.train_batch_size * 1. / FLAGS.num_train_images - 5
       decay_times = math.log(FLAGS.final_base_lr / FLAGS.base_learning_rate) / math.log(0.97)
       decay_epochs = total_epochs / decay_times
-      tf.logging.info(
+      tf.compat.v1.logging.info(
           'setting decay_epochs to {:.2f}'.format(decay_epochs) + '\n' * 3)
     else:
       decay_epochs = 2.4 * FLAGS.train_ratio
@@ -658,7 +658,7 @@ def model_fn(features, mode, params):
     eval_metrics = (metric_fn, [labels, logits])
 
   num_params = np.sum([np.prod(v.shape) for v in tf.trainable_variables()])
-  tf.logging.info('number of trainable parameters: {}'.format(num_params))
+  tf.compat.v1.logging.info('number of trainable parameters: {}'.format(num_params))
 
   return tf.estimator.tpu.TPUEstimatorSpec(
       mode=mode,
@@ -756,9 +756,9 @@ def main(unused_argv):
   # Input pipelines are slightly different (with regards to shuffling and
   # preprocessing) between training and evaluation.
   if FLAGS.label_data_dir == FAKE_DATA_DIR:
-    tf.logging.info('Using fake dataset.')
+    tf.compat.v1.logging.info('Using fake dataset.')
   else:
-    tf.logging.info('Using dataset: %s', FLAGS.label_data_dir)
+    tf.compat.v1.logging.info('Using dataset: %s', FLAGS.label_data_dir)
 
   train_data = data_input.DataInput(
       is_training=True,
@@ -771,7 +771,7 @@ def main(unused_argv):
     current_step = estimator._load_global_step_from_checkpoint_dir(
         FLAGS.model_dir)  # pylint: disable=protected-access,line-too-long
 
-    tf.logging.info(
+    tf.compat.v1.logging.info(
         'Training for %d steps (%.2f epochs in total). Current'
         ' step %d.', FLAGS.train_last_step_num,
         FLAGS.train_last_step_num / params['steps_per_epoch'],
@@ -802,7 +802,7 @@ def main(unused_argv):
       eval_results = est.evaluate(
           input_fn=input_fn_mapping[subset],
           steps=num_images // FLAGS.eval_batch_size)
-      tf.logging.info('%s, results: %s', subset, eval_results)
+      tf.compat.v1.logging.info('%s, results: %s', subset, eval_results)
   elif FLAGS.mode == 'predict':
       predict_label.run_prediction(est)
   else:
@@ -810,5 +810,5 @@ def main(unused_argv):
 
 
 if __name__ == '__main__':
-  tf.logging.set_verbosity(tf.logging.INFO)
+  tf.logging.set_verbosity(tf.compat.v1.logging.info)
   app.run(main)

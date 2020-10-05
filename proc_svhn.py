@@ -66,16 +66,16 @@ def download_and_extract():
           split, field))):
         all_exist = False
   if all_exist:
-    tf.logging.info('found all merged files')
+    tf.compat.v1.logging.info('found all merged files')
     return
-  tf.logging.info('downloading dataset')
+  tf.compat.v1.logging.info('downloading dataset')
   tf.gfile.MakeDirs(download_folder)
   tf.gfile.MakeDirs(merge_folder)
   if FLAGS.task_name == 'svhn':
     for split in splits:
       filename = os.path.join(download_folder, '{}_32x32.mat'.format(split))
       urlretrieve(SVHN_DOWNLOAD_URL.format(split), filename)
-      tf.logging.info('downloaded {}'.format(filename))
+      tf.compat.v1.logging.info('downloaded {}'.format(filename))
       filename = os.path.join(download_folder, '{}_32x32.mat'.format(split))
       data_dict = scipy.io.loadmat(tf.gfile.Open(filename, "rb"))
       images = np.transpose(data_dict['X'], [3, 0, 1, 2])
@@ -124,7 +124,7 @@ def save_tfrecord(data):
       else:
         output_filename = '%s-%.5d-of-%.5d' % (subset, i, num_shards)
       if i % 10 == 0:
-        tf.logging.info('saving {}'.format(output_filename))
+        tf.compat.v1.logging.info('saving {}'.format(output_filename))
       writer = tf.python_io.TFRecordWriter(
           os.path.join(output_dir, output_filename))
       for j in range(shard_spacing[i], shard_spacing[i + 1]):
@@ -172,7 +172,7 @@ def main(argv):
     data['train']['labels'] = data['train']['labels'][dev_size:]
   else:
     data['dev'] = data['test']
-  tf.logging.info("dev labels" + str(data['dev']['labels'][:1000]) + '\n' * 5)
+  tf.compat.v1.logging.info("dev labels" + str(data['dev']['labels'][:1000]) + '\n' * 5)
   if not FLAGS.full_train_data:
     if FLAGS.task_name == 'svhn':
       assert data['train']['images'].shape[0] == 73257 - 4000

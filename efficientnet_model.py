@@ -131,7 +131,7 @@ def round_filters(filters, global_params):
   # Make sure that round down does not go down by more than 10%.
   if new_filters < 0.9 * filters:
     new_filters += divisor
-  tf.logging.info('round_filter input={} output={}'.format(orig_f, new_filters))
+  tf.compat.v1.logging.info('round_filter input={} output={}'.format(orig_f, new_filters))
   return int(new_filters)
 
 
@@ -276,7 +276,7 @@ class MBConvBlock(object):
     '''
     se_tensor = tf.reduce_mean(input_tensor, self._spatial_dims, keepdims=True)
     se_tensor = self._se_expand(self._relu_fn(self._se_reduce(se_tensor)))
-    tf.logging.info('Built Squeeze and Excitation with tensor shape: %s' %
+    tf.compat.v1.logging.info('Built Squeeze and Excitation with tensor shape: %s' %
                     (se_tensor.shape))
     return tf.sigmoid(se_tensor) * input_tensor
 
@@ -291,18 +291,18 @@ class MBConvBlock(object):
     Returns:
       A output tensor.
     '''
-    tf.logging.info('Block input: %s shape: %s' % (inputs.name, inputs.shape))
+    tf.compat.v1.logging.info('Block input: %s shape: %s' % (inputs.name, inputs.shape))
     if self._block_args.expand_ratio != 1:
       x = self._relu_fn(self._bn0(self._expand_conv(inputs),
                                   training=training and self.trainable))
     else:
       x = inputs
-    tf.logging.info('Expand: %s shape: %s' % (x.name, x.shape))
+    tf.compat.v1.logging.info('Expand: %s shape: %s' % (x.name, x.shape))
 
     x = self._relu_fn(self._bn1(self._depthwise_conv(x),
                                 training=training and self.trainable))
 
-    tf.logging.info('DWConv: %s shape: %s' % (x.name, x.shape))
+    tf.compat.v1.logging.info('DWConv: %s shape: %s' % (x.name, x.shape))
 
     if self._has_se:
       with tf.variable_scope('se'):
@@ -323,7 +323,7 @@ class MBConvBlock(object):
               training and self.trainable,
               stochastic_depth_rate)
         x = tf.add(x, inputs)
-    tf.logging.info('Project: %s shape: %s' % (x.name, x.shape))
+    tf.compat.v1.logging.info('Project: %s shape: %s' % (x.name, x.shape))
     return x
 
 
@@ -461,7 +461,7 @@ class Model(tf.keras.Model):
       outputs = self._relu_fn(
           self._bn0(self._conv_stem(inputs),
                     training=training and FLAGS.fix_layer_num == -1))
-    tf.logging.info('Built stem layers with output shape: %s' % outputs.shape)
+    tf.compat.v1.logging.info('Built stem layers with output shape: %s' % outputs.shape)
     self.endpoints['stem'] = outputs
 
     # Calls blocks.
@@ -477,7 +477,7 @@ class Model(tf.keras.Model):
         drop_rate = self._global_params.stochastic_depth_rate
         if drop_rate:
           drop_rate *= float(idx) / len(self._blocks)
-          tf.logging.info('block_%s stochastic_depth_rate: %s' % (idx, drop_rate))
+          tf.compat.v1.logging.info('block_%s stochastic_depth_rate: %s' % (idx, drop_rate))
         outputs = block.call(
             outputs, training=training and idx >= FLAGS.fix_layer_num,
             stochastic_depth_rate=drop_rate)
