@@ -810,5 +810,5 @@ def main(unused_argv):
 
 
 if __name__ == '__main__':
-  tf.logging.set_verbosity(tf.compat.v1.logging.info)
+  tf.compat.v1.logging.set_verbosity(10)
   app.run(main)
