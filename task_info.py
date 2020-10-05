@@ -27,11 +27,9 @@ def get_mean_std(task_name):
   elif task_name == 'svhn':
     mean = [0.4376821 * 255, 0.4437697 * 255, 0.47280442 * 255]
     stddev = [0.19803012 * 255, 0.20101562 * 255, 0.19703614 * 255]
-  elif task_name == 'yt8m':
-    mean = [0, 0, 0]
-    stddev = [1, 1, 1]
   else:
-    assert False
+    mean = [0.2724930 * 255, 0.2266999 * 255, 0.20611580 * 255]
+    stddev = [0.25965613 * 255, 0.231635 * 255, 0.22324292 * 255]
   return mean, stddev
 
 
@@ -40,23 +38,16 @@ def get_num_train_images(task_name):
     return 1281167
   elif task_name == 'svhn':
     return 73257 - 4000
-  elif task_name == 'yt8m':
-    return 124
   else:
-    tf.compat.v1.logging.info(task_name)
-    assert False, task_name
-
+    return 11131
 
 def get_num_eval_images(task_name):
   if task_name == 'imagenet':
     return 50000
   elif task_name == 'svhn':
     return 4000
-  elif task_name == 'yt8m':
-    return 0
   else:
-    tf.compat.v1.logging.info(task_name)
-    assert False, task_name
+    return 1391
 
 
 def get_num_test_images(task_name):
@@ -65,5 +56,4 @@ def get_num_test_images(task_name):
   elif task_name == 'yt8m':
     return 0
   else:
-    tf.compat.v1.logging.info(task_name)
-    assert False, task_name
+    return 1391
