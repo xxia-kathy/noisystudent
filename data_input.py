@@ -131,7 +131,7 @@ class TFExampleInput(object):
   def unl_dst_parser(self, value):
     keys_to_features = {
         'probabilities':
-            tf.FixedLenFeature([FLAGS.num_label_classes], tf.float32, 0),
+            tf.FixedLenFeature([FLAGS.num_label_classes], tf.float32, [0] * FLAGS.num_label_classes),
         'label':
             tf.FixedLenFeature([], tf.int64, -1),
         'prob':
