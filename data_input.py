@@ -135,7 +135,7 @@ class TFExampleInput(object):
         'label':
             tf.FixedLenFeature([], tf.int64, -1),
         'prob':
-            tf.FixedLenFeature([], tf.float32),
+            tf.FixedLenFeature([], tf.float32, 0),
         'image/encoded':
             tf.FixedLenFeature((), tf.string, ''),
     }
